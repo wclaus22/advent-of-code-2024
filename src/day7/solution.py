@@ -1,6 +1,8 @@
 """solution for day 7"""
 
+from typing import List, Callable
 from equation import EquationValidator
+from operations import add, multiply, concatenate
 
 
 def load_data():
@@ -18,13 +20,13 @@ def load_data():
     return results, equations
 
 
-def solve1():
-    """solve part 1"""
+def solve(operations: List[Callable]):
+    """solve part 1 and part two with the same function :)"""
     results, equation_parts = load_data()
 
     valid_targets_sum = 0
     for target, parts in zip(results, equation_parts):
-        eqn = EquationValidator(parts)
+        eqn = EquationValidator(parts, operations)
         if eqn.is_valid(target):
             valid_targets_sum += target
 
@@ -32,4 +34,4 @@ def solve1():
 
 
 if __name__ == "__main__":
-    solve1()
+    solve(operations=[add, multiply, concatenate])

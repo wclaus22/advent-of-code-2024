@@ -1,24 +1,23 @@
 """equation module for the day 7 solution"""
 
-from typing import List
+from typing import List, Callable
 
 
 class Node:
-    """node object for the binary search tree"""
+    """node object for the tree data structure"""
 
     def __init__(self, value):
         self.value = value
-        self.left = None
-        self.right = None
+        self.children = []
 
 
 class EquationValidator:
-    """a binary search tree to hold all of the possible computations
+    """a search tree to hold all of the possible computations
     for the given parts of the equation"""
 
-    def __init__(self, parts):
+    def __init__(self, parts, operations):
         self.root = Node(parts[0])
-        _build_binary_tree(self.root, parts[1:])
+        _build_tree(self.root, parts[1:], operations)
 
     def is_valid(self, target: int) -> bool:
         """check if the target is in the tree"""
@@ -29,30 +28,22 @@ class EquationValidator:
         if node.value is None:
             return False
 
-        if node.left is None and node.right is None:
+        # check if leaf-node (it has no children)
+        if len(node.children) == 0:
             return node.value == target
 
-        return self._traverse(node.left, target) or self._traverse(node.right, target)
+        return any(self._traverse(child, target) for child in node.children)
 
 
-def add(a, b):
-    """add two numbers together"""
-    return a + b
-
-
-def multiply(a, b):
-    """multiply two numbers together"""
-    return a * b
-
-
-def _build_binary_tree(node: Node, parts: List[int]) -> Node:
-    """build the binary search tree"""
+def _build_tree(node: Node, parts: List[int], operations: List[Callable]) -> Node:
+    """build the search tree"""
+    # no more parts left in the equation
     if len(parts) == 0:
         return
 
     new_part = parts[0]
-    node.left = Node(add(node.value, new_part))
-    node.right = Node(multiply(node.value, new_part))
+    for operation in operations:
+        node.children.append(Node(operation(node.value, new_part)))
 
-    _build_binary_tree(node.left, parts[1:])
-    _build_binary_tree(node.right, parts[1:])
+    for child in node.children:
+        _build_tree(child, parts[1:], operations)
