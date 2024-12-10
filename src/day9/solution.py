@@ -67,30 +67,41 @@ def solve2():
 
     pool = []
     for i, cnt in enumerate(cnt_idx):
-        pool.extend([i] * cnt)
+        pool.append([i] * cnt)
 
-    position = 1
-    current_idx = pool.pop(0)
+    position = 0
+    new_idx = True
+    tot_length = len(pool)
     while len(pool) > 0:
-        # change in index value in pool indicates a skip
-        if pool[0] == current_idx:
-            current_idx = pool.pop(0)
-            checksum += position * current_idx
-            position += 1
+        print(f"{len(pool)}/{tot_length}")
+        if new_idx:
+            current_indices = pool.pop(0)
+            for idx in current_indices:
+                checksum += position * int(idx)
+                position += 1
+            new_idx = False
         else:
             positions_skipped = cnt_free.pop(0)
-            for _ in range(positions_skipped):
-                # for each skipped position, take one of the final values
-                if len(pool) == 0:
+            while positions_skipped > 0:
+                for j, candidate in enumerate(pool[::-1]):
+                    if len(candidate) <= positions_skipped and not isinstance(
+                        candidate[0], str
+                    ):
+
+                        for _ in range(len(candidate)):
+                            checksum += candidate[0] * position
+                            position += 1
+                            positions_skipped -= 1
+
+                        pool[-j - 1] = ["0"] * len(candidate)
+                        break
+                else:
+                    position += positions_skipped
                     break
-                checksum += position * pool.pop(-1)
-                position += 1
-            if len(pool) == 0:
-                break
-            current_idx = pool[0]
+            new_idx = True
 
     print(checksum)
 
 
 if __name__ == "__main__":
-    solve1()
+    solve2()
