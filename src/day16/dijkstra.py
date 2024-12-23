@@ -12,16 +12,18 @@ class Node:
         self.y = y
         self.direction = direction
 
-    def move(self, direction: Literal["^", "v", "<", ">"]) -> Tuple[int, int]:
+    def move(
+        self, direction: Literal["^", "v", "<", ">"], n_steps: int = 1
+    ) -> Tuple[int, int]:
         """move the node position based on the direction"""
         if direction == "^":
-            return self.x - 1, self.y
+            return self.x - n_steps, self.y
         if direction == "v":
-            return self.x + 1, self.y
+            return self.x + n_steps, self.y
         if direction == "<":
-            return self.x, self.y - 1
+            return self.x, self.y - n_steps
         if direction == ">":
-            return self.x, self.y + 1
+            return self.x, self.y + n_steps
 
 
 def get_valid_directions(direction: Literal["^", "v", "<", ">"]) -> List[str]:
@@ -89,3 +91,20 @@ def traverse_grid(
         indices = np.argsort([scores[node.x, node.y] for node in selected_nodes])
         for i in indices:
             queue.append(selected_nodes[i])
+
+
+def backwards_traverse(scores: np.ndarray, tags: np.ndarray, node: Node):
+    """backwards traversion of the scores and updating the tags"""
+
+    tags[node.x, node.y] = "O"
+    for direction in ["^", "v", "<", ">"]:
+        next_x, next_y = node.move(direction)
+        current_score = scores[node.x, node.y]
+        # move in same direction
+        if scores[next_x, next_y] == current_score - 1:
+            backwards_traverse(scores, tags, Node(next_x, next_y, direction))
+        elif scores[next_x, next_y] == current_score - 1001:
+            backwards_traverse(scores, tags, Node(next_x, next_y, direction))
+            next_x, next_y = node.move(direction, n_steps=2)
+            if scores[next_x, next_y] < current_score:
+                backwards_traverse(scores, tags, Node(next_x, next_y, direction))

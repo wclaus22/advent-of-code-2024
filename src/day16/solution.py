@@ -2,7 +2,7 @@
 
 import numpy as np
 import pandas as pd
-from dijkstra import traverse_grid, Node
+from dijkstra import traverse_grid, Node, backwards_traverse
 
 
 def load_data(path: str):
@@ -12,9 +12,9 @@ def load_data(path: str):
     return np.array([list(row) for row in data]).astype("object")
 
 
-def solve1():
-    """solve first part"""
-    grid = load_data("data/day16/test2")
+def solve():
+    """solve both first and second parts"""
+    grid = load_data("data/day16/input")
 
     x_init, y_init = np.where(grid == "S")
 
@@ -30,10 +30,14 @@ def solve1():
     print(pd.DataFrame(scores))
     print(pd.DataFrame(directions))
 
-    # breakpoint()
-    # tags = np.ones_like(grid).astype("object")
-    # backwards_traverse(scores)
+    tags = np.array(
+        [["." for _ in range(scores.shape[1])] for _ in range(scores.shape[0])]
+    ).astype("object")
+    final_node = Node(x_final[0], y_final[0], ">")
+    backwards_traverse(scores, tags, final_node)
+
+    print(np.sum(tags == "O"))
 
 
 if __name__ == "__main__":
-    solve1()
+    solve()
