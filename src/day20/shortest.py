@@ -5,6 +5,16 @@ import numpy as np
 from numpy.typing import NDArray
 
 
+def is_valid(x_idx: int, y_idx: int, grid: NDArray) -> bool:
+    """find out if indices fit into the grid"""
+    _is_valid = True
+    if x_idx < 0 or x_idx >= grid.shape[0]:
+        _is_valid = False
+    if y_idx < 0 or y_idx >= grid.shape[1]:
+        _is_valid = False
+    return _is_valid
+
+
 def neighbors(current: tuple, grid: NDArray) -> list:
     """get neighbors of current cell"""
     x, y = current
